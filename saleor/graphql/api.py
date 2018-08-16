@@ -42,6 +42,9 @@ from .page.resolvers import resolve_pages, resolve_page
 from .page.types import Page
 from .page.mutations import PageCreate, PageDelete, PageUpdate
 from .product.schema import ProductMutations, ProductQueries
+from .payment.types import Payment
+from .payment.resolvers import resolve_payments, resolve_payment_client_token
+from .payment.mutations import CompleteCheckoutWithCreditCard
 from .shipping.resolvers import resolve_shipping_zones
 from .shipping.types import ShippingZone
 from .shipping.mutations import (
@@ -62,16 +65,20 @@ class Query(ProductQueries):
         name=graphene.Argument(graphene.String, description="Menu name."),
         description='Lookup a menu by ID or name.')
     menus = DjangoFilterConnectionField(
-        Menu, query=graphene.String(description=DESCRIPTIONS['menu']),
+        Menu,
+        query=graphene.String(description=DESCRIPTIONS['menu']),
         description="List of the shop\'s menus.")
     menu_item = graphene.Field(
-        MenuItem, id=graphene.Argument(graphene.ID),
+        MenuItem,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a menu item by ID.')
     menu_items = DjangoFilterConnectionField(
-        MenuItem, query=graphene.String(description=DESCRIPTIONS['menu_item']),
+        MenuItem,
+        query=graphene.String(description=DESCRIPTIONS['menu_item']),
         description='List of the shop\'s menu items.')
     order = graphene.Field(
-        Order, description='Lookup an order by ID.',
+        Order,
+        description='Lookup an order by ID.',
         id=graphene.Argument(graphene.ID))
     orders_total = graphene.Field(
         TaxedMoney, description='Total sales.',
@@ -97,18 +104,28 @@ class Query(ProductQueries):
         Page, query=graphene.String(
             description=DESCRIPTIONS['page']),
         description='List of the shop\'s pages.')
+    payment = graphene.Field(Payment, id=graphene.Argument(graphene.ID))
+    payment_client_token = graphene.Field(
+        graphene.String, customer_id=graphene.String(description=''))
+    payments = DjangoFilterConnectionField(
+        Payment,
+        description='List of payments')
     sale = graphene.Field(
-        Sale, id=graphene.Argument(graphene.ID),
+        Sale,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a sale by ID.')
     sales = DjangoFilterConnectionField(
-        Sale, query=graphene.String(description=DESCRIPTIONS['sale']),
+        Sale,
+        query=graphene.String(description=DESCRIPTIONS['sale']),
         description="List of the shop\'s sales.")
     shop = graphene.Field(Shop, description='Represents a shop resources.')
     voucher = graphene.Field(
-        Voucher, id=graphene.Argument(graphene.ID),
+        Voucher,
+        id=graphene.Argument(graphene.ID),
         description='Lookup a voucher by ID.')
     vouchers = DjangoFilterConnectionField(
-        Voucher, query=graphene.String(description=DESCRIPTIONS['product']),
+        Voucher,
+        query=graphene.String(description=DESCRIPTIONS['product']),
         description="List of the shop\'s vouchers.")
     shipping_zone = graphene.Field(
         ShippingZone, id=graphene.Argument(graphene.ID),
@@ -116,12 +133,12 @@ class Query(ProductQueries):
     shipping_zones = DjangoFilterConnectionField(
         ShippingZone, description='List of the shop\'s shipping zones.')
     user = graphene.Field(
-        User, id=graphene.Argument(graphene.ID),
+        User,
+        id=graphene.Argument(graphene.ID),
         description='Lookup an user by ID.')
     customers = DjangoFilterConnectionField(
         User, description='List of the shop\'s users.',
-        query=graphene.String(
-            description=DESCRIPTIONS['user']))
+        query=graphene.String(description=DESCRIPTIONS['user']))
     staff_users = DjangoFilterConnectionField(
         User, description='List of the shop\'s staff users.',
         query=graphene.String(description=DESCRIPTIONS['user']))
@@ -164,6 +181,19 @@ class Query(ProductQueries):
     @permission_required('order.manage_orders')
     def resolve_orders_total(self, info, period, **kwargs):
         return resolve_orders_total(info, period)
+
+    @login_required
+    def resolve_orders(self, info, query=None, **kwargs):
+        return resolve_orders(info, query)
+
+    def resolve_payment_method(self, info, id):
+        return graphene.Node.get_node_from_global_id(info, id, PaymentMethod)
+
+    def resolve_payment_client_token(self, info, customer_id=None):
+        return resolve_payment_client_token(customer_id)
+
+    def resolve_payments(self, info, query=None, **kwargs):
+        return resolve_payments(info, query)
 
     @login_required
     def resolve_orders(
