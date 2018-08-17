@@ -64,20 +64,16 @@ class Query(ProductQueries):
         name=graphene.Argument(graphene.String, description="Menu name."),
         description='Lookup a menu by ID or name.')
     menus = DjangoFilterConnectionField(
-        Menu,
-        query=graphene.String(description=DESCRIPTIONS['menu']),
+        Menu, query=graphene.String(description=DESCRIPTIONS['menu']),
         description="List of the shop\'s menus.")
     menu_item = graphene.Field(
-        MenuItem,
-        id=graphene.Argument(graphene.ID),
+        MenuItem, id=graphene.Argument(graphene.ID),
         description='Lookup a menu item by ID.')
     menu_items = DjangoFilterConnectionField(
-        MenuItem,
-        query=graphene.String(description=DESCRIPTIONS['menu_item']),
+        MenuItem, query=graphene.String(description=DESCRIPTIONS['menu_item']),
         description='List of the shop\'s menu items.')
     order = graphene.Field(
-        Order,
-        description='Lookup an order by ID.',
+        Order, description='Lookup an order by ID.',
         id=graphene.Argument(graphene.ID))
     orders_total = graphene.Field(
         TaxedMoney, description='Total sales.',
@@ -110,21 +106,17 @@ class Query(ProductQueries):
         Payment,
         description='List of payments')
     sale = graphene.Field(
-        Sale,
-        id=graphene.Argument(graphene.ID),
+        Sale, id=graphene.Argument(graphene.ID),
         description='Lookup a sale by ID.')
     sales = DjangoFilterConnectionField(
-        Sale,
-        query=graphene.String(description=DESCRIPTIONS['sale']),
+        Sale, query=graphene.String(description=DESCRIPTIONS['sale']),
         description="List of the shop\'s sales.")
     shop = graphene.Field(Shop, description='Represents a shop resources.')
     voucher = graphene.Field(
-        Voucher,
-        id=graphene.Argument(graphene.ID),
+        Voucher, id=graphene.Argument(graphene.ID),
         description='Lookup a voucher by ID.')
     vouchers = DjangoFilterConnectionField(
-        Voucher,
-        query=graphene.String(description=DESCRIPTIONS['product']),
+        Voucher, query=graphene.String(description=DESCRIPTIONS['product']),
         description="List of the shop\'s vouchers.")
     shipping_zone = graphene.Field(
         ShippingZone, id=graphene.Argument(graphene.ID),
@@ -132,8 +124,7 @@ class Query(ProductQueries):
     shipping_zones = DjangoFilterConnectionField(
         ShippingZone, description='List of the shop\'s shipping zones.')
     user = graphene.Field(
-        User,
-        id=graphene.Argument(graphene.ID),
+        User, id=graphene.Argument(graphene.ID),
         description='Lookup an user by ID.')
     customers = DjangoFilterConnectionField(
         User, description='List of the shop\'s users.',
@@ -310,6 +301,9 @@ class Mutations(ProductMutations):
     shipping_price_create = ShippingPriceCreate.Field()
     shipping_price_delete = ShippingPriceDelete.Field()
     shipping_price_update = ShippingPriceUpdate.Field()
+
+    variant_image_assign = VariantImageAssign.Field()
+    variant_image_unassign = VariantImageUnassign.Field()
 
 
 schema = graphene.Schema(Query, Mutations)
