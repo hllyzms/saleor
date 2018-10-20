@@ -161,7 +161,7 @@ class Order(CountableDjangoObjectType):
         # FIXME adjust to multiple payments in the future
         payment = obj.get_last_payment()
         if payment:
-            return payment.total.gross
+            return payment.total
 
     @staticmethod
     def resolve_total_captured(obj, info):
