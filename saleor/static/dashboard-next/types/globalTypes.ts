@@ -160,6 +160,7 @@ export interface CategoryInput {
   name?: string | null;
   slug?: string | null;
   seo?: SeoInput | null;
+  backgroundImage?: any | null;
 }
 
 export interface CollectionInput {
